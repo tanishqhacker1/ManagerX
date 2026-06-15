@@ -1,3 +1,4 @@
+import path from "path";
 import express from "express";
 import cors from "cors";
 import { z } from "zod";
@@ -5,6 +6,11 @@ import { z } from "zod";
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+const clientDist = path.join(__dirname, "..", "..", "client", "dist");
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(clientDist));
+}
 
 const AgentRole = z.enum(["CEO", "CTO", "Engineer", "Designer", "Analyst"]);
 const AgentStatus = z.enum(["idle", "working", "review", "blocked"]);
@@ -126,6 +132,12 @@ app.patch("/api/tasks/:id", (req, res) => {
   Object.assign(task, payload.data);
   res.json(task);
 });
+
+if (process.env.NODE_ENV === "production") {
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(clientDist, "index.html"));
+  });
+}
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 4000;
 app.listen(PORT, () => {

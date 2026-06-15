@@ -5,5 +5,10 @@
   "workspaces": [
     "server",
     "client"
-  ]
+  ],
+  "scripts": {
+    "build": "npm --workspaces run build",
+    "start": "npm --workspaces run start",
+    "dev": "npm --workspace server run dev & npm --workspace client run dev"
+  }
 }
