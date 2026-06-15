@@ -52,10 +52,31 @@ docker build -t managerx .
 docker run -p 4000:4000 managerx
 ```
 
-If you want to use NGINX as a reverse proxy for `tanishq1-is.a.dev`, use the provided `docker-compose.yml` and `nginx.conf`.
+## HTTPS deployment with NGINX and Certbot
+
+The provided `docker-compose.yml` includes an `nginx` reverse proxy and a `certbot` service for Let's Encrypt certificate issuance.
+
+1. Point `tanishq1-is.a.dev` to your host IP.
+2. Start the app and proxy:
 
 ```bash
-docker compose up --build
+docker compose up -d --build managerx nginx
 ```
 
-Make sure your host firewall allows port `80` and the domain resolves to the correct server.
+3. Request certificates:
+
+```bash
+docker compose run --rm certbot
+```
+
+4. Reload NGINX:
+
+```bash
+docker compose exec nginx nginx -s reload
+```
+
+5. Open `https://tanishq1-is.a.dev`.
+
+If the certificate issuance fails, check that port `80` is reachable and the DNS record is correct.
+
+Make sure your host firewall allows ports `80` and `443` and the domain resolves to the server.
